@@ -5,14 +5,45 @@
 <link href='http://fonts.googleapis.com/css?family=Oswald' rel='stylesheet' type='text/css'>
 <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
 <script src="//code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
-
+<link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/themes/smoothness/jquery-ui.css">
 <script src="http://code.highcharts.com/highcharts.js"></script>
+
+<script>
+ $(function() {
+   $( "#dialog" ).dialog({
+     autoOpen: false,
+     width:800,
+     height:610,
+     show: {
+       effect: "blind",
+       duration: 600
+     },
+     hide: {
+       effect: "blind",
+       duration: 600
+     }
+   });
+
+   $( "#opener" ).click(function() {
+     $( "#dialog" ).dialog( "open" );
+   });
+ });
+ </script>
 
 </head>
 
 
 <body>
+
 <p id="title1">Current Squad Performance Index</p>
+
+<div id='dialog' title='Individual Stats'>
+  <p id=\"rcorners\">
+  <iframe width="750" height="500" src="https://www.youtube.com/embed/29Y3CVuLrsM" frameborder="0" allowfullscreen></iframe>
+  </p>
+  </div>
+  <p id=\"rcorners\"><button id='opener'>Open Dialog</button></p>
+
 <table>
   <tr>
     <td>
@@ -42,6 +73,7 @@
   ORDER BY rating1 DESC" ;
   $result1 = $conn->query($sql);
 
+
   $ratingPull=array();
   $namesArray=array();
 
@@ -62,6 +94,7 @@
        <br><br>Average Rating: "
        . $row["rating1"]. "       </td>
       <td><img id='img_blue' src='../img/players/" . $row["playerImage"]. "'><br>
+
         </td>
     </tr>
   </table>
@@ -109,6 +142,7 @@ $( document ).ready(function() {
   });
 });
 </script>
+
 
 </body>
 </html>
