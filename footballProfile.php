@@ -2,7 +2,7 @@
 <head>
 
 <link rel="stylesheet" type="text/css" href="theme.css">
-<link href='http://fonts.googleapis.com/css?family=Oswald' rel='stylesheet' type='text/css'>
+<link href='http://fonts.googleapis.com/css?family=Montserrat' rel='stylesheet' type='text/css'>
 <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
 <script src="//code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
 <link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/themes/smoothness/jquery-ui.css">
@@ -30,6 +30,22 @@
  });
  </script>
 
+ <?php
+ $servername = "localhost";
+ $username = "root";
+ $password = "irene";
+ $dbname = "footballdb";
+
+ // Create connection
+ $conn = new mysqli($servername, $username, $password, $dbname);
+
+ // Check connection
+ if ($conn->connect_error) {
+     die("Connection failed: " . $conn->connect_error);
+ }
+?>
+
+
 </head>
 
 
@@ -37,32 +53,19 @@
 
 <p id="title1">Current Squad Performance Index</p>
 
-<div id='dialog' title='Individual Stats'>
+<div id='dialog' title='Highlights Video'>
   <p id=\"rcorners\">
   <iframe width="750" height="500" src="https://www.youtube.com/embed/29Y3CVuLrsM" frameborder="0" allowfullscreen></iframe>
   </p>
   </div>
-  <p id=\"rcorners\"><button id='opener'>Open Dialog</button></p>
+  <p id=\"rcorners\"><button id='opener'>Highlights Video</button></p>
 
 <table>
   <tr>
     <td>
 
-  <?php
-  $servername = "localhost";
-  $username = "root";
-  $password = "irene";
-  $dbname = "footballdb";
 
-  // Create connection
-  $conn = new mysqli($servername, $username, $password, $dbname);
-
-  // Check connection
-  if ($conn->connect_error) {
-      die("Connection failed: " . $conn->connect_error);
-  }
-
-
+<?php
   $sql = "SELECT fp.playerId,s.shirtNumber,c.countryName,c.countryCode,fp.firstName,fp.lastName,CONCAT(fp.firstName,' ',fp.lastName) AS 'fullName',fp.playerImage,ROUND(AVG(mr.playerRating),2) 'rating1',
   GROUP_CONCAT(mr.playerRating,' ') 'recentRatings'
   FROM footballplayers fp
@@ -76,6 +79,10 @@
 
   $ratingPull=array();
   $namesArray=array();
+  $idArray=array();
+  $recentRatingsArray=array();
+
+
 
   if ($result1->num_rows > 0) {
       // output data of each row
@@ -83,21 +90,33 @@
 
         $ratingPull[]=$row["rating1"];
         $namesArray[]=$row["fullName"];
+        $idArray[]=$row["playerId"];
+        $recentRatingsArray[]=$row["recentRatings"];
 
           echo "<p id=\"rcorners\"><table border='1' style='width:100%'>
 
         <tr>
-      <td width='300'>Player Name: "
+      <td width='300'><huge>"
       . $row["fullName"].
-      "<br><br>Squad Number: "
-       . $row["shirtNumber"]. "<br><br>Country: " . $row['countryName']. " <img src='../img/flags/" . $row['countryCode']. ".png'>
-       <br><br>Average Rating: "
-       . $row["rating1"]. "       </td>
-      <td><img id='img_blue' src='../img/players/" . $row["playerImage"]. "'><br>
+      "</huge><br><br>Squad Number: "
+       . $row["shirtNumber"]. "<br>Country: " . $row['countryName']. " <img src='../img/flags/" . $row['countryCode']. ".png'>
+       <br>Average Rating: "
+       . $row["rating1"]. "
+
+ </td>
+      <td>
+
+
+         <img id='img_blue' src='../img/players/" . $row["playerImage"]. "'>
+
+
 
         </td>
     </tr>
   </table>
+
+
+
   ";
      }
   } else {
@@ -117,6 +136,8 @@
 </td>
 </tr>
 </table>
+
+
 
 <script>
 $( document ).ready(function() {
@@ -142,6 +163,7 @@ $( document ).ready(function() {
   });
 });
 </script>
+
 
 
 </body>
