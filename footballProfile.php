@@ -7,6 +7,9 @@
 <script src="//code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
 <link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/themes/smoothness/jquery-ui.css">
 <script src="http://code.highcharts.com/highcharts.js"></script>
+<script src="jquery.bxslider.min.js"></script>
+<link href="jquery.bxslider.css" rel="stylesheet">
+<script src="slider.js"></script>
 
 <script>
  $(function() {
@@ -44,7 +47,6 @@
      die("Connection failed: " . $conn->connect_error);
  }
 ?>
-
 
 </head>
 
@@ -131,7 +133,14 @@
 </td>
 <td>
 
-  <p id='container' style='width:850px; height:700px;'></p>
+  <p id='container' style='width:850px; height:700px;'><br><br>
+    </p>
+    <ul class="bxslider">
+      <li><img src="../img/stadiums/mem1.jpg" title="From the Home End"></li>
+      <li><img src="../img/stadiums/mem2.jpg" title="From the Away End"></li>
+    </ul>
+
+
 
 </td>
 </tr>
