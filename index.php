@@ -1,8 +1,37 @@
 <html>
 <head>
-  <link rel="stylesheet" type="text/css" href="theme.css">
-  <link href='http://fonts.googleapis.com/css?family=Montserrat' rel='stylesheet' type='text/css'>
-</head>
+
+<link rel="stylesheet" type="text/css" href="theme.css">
+<link href='http://fonts.googleapis.com/css?family=Montserrat' rel='stylesheet' type='text/css'>
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
+<script src="//code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
+<link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/themes/smoothness/jquery-ui.css">
+<script src="http://code.highcharts.com/highcharts.js"></script>
+<script src="jquery.bxslider.min.js"></script>
+<link href="jquery.bxslider.css" rel="stylesheet">
+<script src="slider.js"></script>
+<meta charset="utf-8">
+
+
+
+<?php
+
+/* Connects to MySQL */
+
+$servername = "localhost";
+$username = "root";
+$password = "irene";
+$dbname = "footballdb";
+
+// Create connection
+$conn = new mysqli($servername, $username, $password, $dbname);
+
+// Check connection
+if ($conn->connect_error) {
+    die("Connection failed: " . $conn->connect_error);
+}
+?>
+
 <body>
 
 <div class="matchTitleText">
@@ -37,96 +66,70 @@ Matchday Page
                     <td>Goals</td>
                     <td>Ratings</td><td>Season AVG</td>
                 </tr>
-                <tr>
-                   <td>#</td>
-                   <td>First Name</td>
-                   <td>Surname</td>
-                   <td>Position</td>
-                   <td>Assists</td>
-                   <td>Goals</td>
-                   <td>Ratings</td><td>Season AVG</td>
+
+                <?php
+                  $sql = "SELECT sn.shirtNumber,fp.playerId 'playerId',fp.firstName,fp.lastName,fp.`position`,md.matchRating 'mRating',COUNT(gs.goalId) 'goalsScored',COUNT(`as`.assistId) 'assistsMade'
+                  FROM matchData md
+                  LEFT JOIN footballPlayers fp ON fp.playerId=md.playerId
+                  LEFT JOIN goalsScored gs ON gs.fixtureId=md.fixtureId AND gs.playerId=md.playerId
+                  LEFT JOIN assistsmade `as` ON `as`.fixtureId=md.fixtureId AND `as`.playerId=md.playerId
+                  LEFT JOIN shirtNumbers sn ON sn.playerId=fp.playerId
+                  WHERE md.startStatus='starter'
+                  GROUP BY fp.playerId
+                  ORDER BY
+                     CASE fp.`position`
+                        WHEN 'Goalkeeper' THEN 1
+                        WHEN 'Defender' THEN 2
+                        WHEN 'Midfielder' THEN 3
+                        WHEN 'Forward' THEN 4
+                        ELSE 5
+                     END, playerId
+                  " ;
+                  $result = $conn->query($sql);
+
+
+                  $shirtNumber=array();
+                  $firstName=array();
+                  $lastName=array();
+                  $position=array();
+                  $mRating=array();
+                  $goalsScored=array();
+                  $assistsMade=array();
+
+
+
+                  if ($result->num_rows > 0) {
+                      // output data of each row
+                      while($row = $result->fetch_assoc()) {
+
+                        $shirtNumber[]=$row["shirtNumber"];
+                        $firstName[]=$row["firstName"];
+                        $lastName[]=$row["lastName"];
+                        $position[]=$row["position"];
+                        $mRating[]=$row["mRating"];
+                        $goalsScored[]=$row["goalsScored"];
+                        $assistsMade[]=$row["assistsMade"];
+
+
+                          echo "<tr>
+                   <td>" . $row['shirtNumber']. "</td>
+                   <td>" . $row['firstName']. "</td>
+                   <td>" . $row['lastName']. "</td>
+                   <td>" . $row['position']. "</td>
+                   <td>" . $row['goalsScored']. "</td>
+                   <td>" . $row['assistsMade']. "</td>
+                   <td>" . $row['mRating']. "</td><td>Season AVG</td>
                 </tr>
-                <tr>
-                   <td>#</td>
-                   <td>First Name</td>
-                   <td>Surname</td>
-                   <td>Position</td>
-                   <td>Assists</td>
-                   <td>Goals</td>
-                   <td>Ratings</td><td>Season AVG</td>
-                </tr>
-                <tr>
-                   <td>#</td>
-                   <td>First Name</td>
-                   <td>Surname</td>
-                   <td>Position</td>
-                   <td>Assists</td>
-                   <td>Goals</td>
-                   <td>Ratings</td><td>Season AVG</td>
-                </tr>
-                <tr>
-                   <td>#</td>
-                   <td>First Name</td>
-                   <td>Surname</td>
-                   <td>Position</td>
-                   <td>Assists</td>
-                   <td>Goals</td>
-                   <td>Ratings</td><td>Season AVG</td>
-                </tr>
-                <tr>
-                   <td>#</td>
-                   <td>First Name</td>
-                   <td>Surname</td>
-                   <td>Position</td>
-                   <td>Assists</td>
-                   <td>Goals</td>
-                   <td>Ratings</td><td>Season AVG</td>
-                </tr>
-                <tr>
-                   <td>#</td>
-                   <td>First Name</td>
-                   <td>Surname</td>
-                   <td>Position</td>
-                   <td>Assists</td>
-                   <td>Goals</td>
-                   <td>Ratings</td><td>Season AVG</td>
-                </tr>
-                <tr>
-                   <td>#</td>
-                   <td>First Name</td>
-                   <td>Surname</td>
-                   <td>Position</td>
-                   <td>Assists</td>
-                   <td>Goals</td>
-                   <td>Ratings</td><td>Season AVG</td>
-                </tr>
-                <tr>
-                   <td>#</td>
-                   <td>First Name</td>
-                   <td>Surname</td>
-                   <td>Position</td>
-                   <td>Assists</td>
-                   <td>Goals</td>
-                   <td>Ratings</td><td>Season AVG</td>
-                </tr>
-                <tr>
-                   <td>#</td>
-                   <td>First Name</td>
-                   <td>Surname</td>
-                   <td>Position</td>
-                   <td>Assists</td>
-                   <td>Goals</td>
-                   <td>Ratings</td><td>Season AVG</td>
-                </tr>
-                <tr>
-                   <td>#</td>
-                   <td>First Name</td>
-                   <td>Surname</td>
-                   <td>Position</td>
-                   <td>Assists</td>
-                   <td>Goals</td>
-                   <td>Ratings</td><td>Season AVG</td>
-                </tr>
+
+                  ";
+                     }
+                  } else {
+                      echo "0 results";
+                  }
+                  $conn->close();
+
+                  ?>
+
               </table>
 
               <table class="defaultText" width="750" height="200">
