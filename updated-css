@@ -82,13 +82,29 @@ background-repeat: no-repeat;
       text-align: left;
     }
 
+    .defaultTextCen {
+        color: black;
+        font: 15px 'Montserrat', sans-serif;
+        text-align: center;
+      }
+
 
  .defaultText tr td,
   {
         color: black;
         font: 15px 'Montserrat', sans-serif;
-        text-align: left;
+        text-align: center;
+        line-height: 14px;
       }
+
+
+.defaultTextTable table, tr td,
+        {
+              color: black;
+              font: 15px 'Montserrat', sans-serif;
+              text-align: center;
+              line-height: 14px;
+            }
 
     .defaultTextCen {
         color: black;
@@ -107,7 +123,7 @@ background-repeat: no-repeat;
 
   .matchLineupTxt {
     color: white;
-    font: 23px 'Montserrat', sans-serif;
+    font: 20px 'Montserrat', sans-serif;
     text-align: center;
     margin-left: auto;
     margin-right: auto;
@@ -116,12 +132,22 @@ background-repeat: no-repeat;
 
   .matchTitleText {
     color: white;
-    font: 33px 'Montserrat', sans-serif;
+    font: 30px 'Montserrat', sans-serif;
     text-align: center;
     margin-left: auto;
     margin-right: auto;
     text-shadow: -2px 0 black, 0 2px black, 2px 0 black, 0 -2px black;
   }
+
+
+    .matchTitleTextLarge {
+      color: white;
+      font: 40px 'Montserrat', sans-serif;
+      text-align: center;
+      margin-left: auto;
+      margin-right: auto;
+      text-shadow: -2px 0 black, 0 2px black, 2px 0 black, 0 -2px black;
+    }
 
   .matchTitleTextSmall {
     color: white;
@@ -169,6 +195,7 @@ background-repeat: no-repeat;
   vertical-align: top;
   margin-left: auto;
   margin-right: auto;
+
   }
 
   .defaultTableTop {
