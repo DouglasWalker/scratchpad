@@ -33,13 +33,17 @@ if ($conn->connect_error) {
 ?>
 
 <body>
-
-<div class="matchTitleText">
-Matchday Page
+<TABLE class="defaultTable" width="1200" height="50">
+<div class="matchTitleTextLarge">
+Bristol Rovers Form Tracker
 </div>
+<div class="matchTitleText">
+  Game Centre</div>
+</table>
+
 <br>
 
-<TABLE class="defaultTable" width="1200" height="900">
+<TABLE class="defaultTable" width="1200" height="1000">
 
 
 <TD class="defaultTable" >
@@ -50,21 +54,21 @@ Matchday Page
 </tr>
 </table>
 
-<table width="750" height="500">
+<table width="750">
  <tr>
        <td>
 
-             <table class="defaultText" width="750" height="300">
-               <tr><td colspan="8" class="defaultTableBlueMidAlign"><div class="matchLineupTxt">Starting Lineup</div></td></tr>
+             <table class="defaultText" width="750">
+               <tr><td colspan="7" class="defaultTableBlueMidAlign" height="25"><div class="matchLineupTxt">Starting Lineup</div></td></tr>
 
                <tr>
-                    <td>#</td>
-                    <td>First Name</td>
-                    <td>Surname</td>
-                    <td>Position</td>
-                    <td>Assists</td>
-                    <td>Goals</td>
-                    <td>Ratings</td><td>Season AVG</td>
+                    <td width='50' class="defaultTextCen">#</td>
+                    <td width='150'>First Name</td>
+                    <td width='150'>Surname</td>
+                    <td width='130'>Position</td>
+                    <td width='90' class="defaultTextCen">Assists</td>
+                    <td width='90' class="defaultTextCen">Goals</td>
+                    <td width='90' class="defaultTextCen">Ratings</td>
                 </tr>
 
                 <?php
@@ -112,13 +116,13 @@ Matchday Page
 
 
                           echo "<tr>
-                   <td>" . $row['shirtNumber']. "</td>
-                   <td>" . $row['firstName']. "</td>
-                   <td>" . $row['lastName']. "</td>
-                   <td>" . $row['position']. "</td>
-                   <td>" . $row['goalsScored']. "</td>
-                   <td>" . $row['assistsMade']. "</td>
-                   <td>" . $row['mRating']. "</td><td>Season AVG</td>
+                   <td class='defaultTextCen'>" .$row['shirtNumber']. "</td>
+                   <td>" .$row['firstName']. "</td>
+                   <td>" .$row['lastName']. "</td>
+                   <td>" .$row['position']. "</td>
+                   <td class='defaultTextCen'>" .$row['goalsScored']. "</td>
+                   <td class='defaultTextCen'>" .$row['assistsMade']. "</td>
+                   <td class='defaultTextCen'>" .$row['mRating']. "</td>
                 </tr>
 
                   ";
@@ -126,79 +130,90 @@ Matchday Page
                   } else {
                       echo "0 results";
                   }
-                  $conn->close();
+
 
                   ?>
 
               </table>
 
-              <table class="defaultText" width="750" height="200">
+              <table class="defaultText" width="750">
 
-                <tr><td colspan="8" class="defaultTableBlueMidAlign"><div class="matchLineupTxt">Substitutes</div></td></tr>
+                <tr><td colspan="7" class="defaultTableBlueMidAlign"><div class="matchLineupTxt">Substitutes</div></td></tr>
+                <tr>
+                     <td width='50' class='defaultTextCen'>#</td>
+                     <td width='150'>First Name</td>
+                     <td width='150'>Surname</td>
+                     <td width='130'>Position</td>
+                     <td width='90' class='defaultTextCen'>Assists</td>
+                     <td width='90' class='defaultTextCen'>Goals</td>
+                     <td width='90' class='defaultTextCen'>Ratings</td>
+                 </tr>
+                <tr>
+                <?php
+                  $sql = "SELECT sn.shirtNumber,fp.playerId 'playerId',fp.firstName,fp.lastName,fp.`position`,md.matchRating 'mRating',COUNT(gs.goalId) 'goalsScored',COUNT(`as`.assistId) 'assistsMade'
+                  FROM matchData md
+                  LEFT JOIN footballPlayers fp ON fp.playerId=md.playerId
+                  LEFT JOIN goalsScored gs ON gs.fixtureId=md.fixtureId AND gs.playerId=md.playerId
+                  LEFT JOIN assistsmade `as` ON `as`.fixtureId=md.fixtureId AND `as`.playerId=md.playerId
+                  LEFT JOIN shirtNumbers sn ON sn.playerId=fp.playerId
+                  WHERE md.startStatus='substitute'
+                  GROUP BY fp.playerId
+                  ORDER BY
+                     CASE fp.`position`
+                        WHEN 'Goalkeeper' THEN 1
+                        WHEN 'Defender' THEN 2
+                        WHEN 'Midfielder' THEN 3
+                        WHEN 'Forward' THEN 4
+                        ELSE 5
+                     END, playerId
+                  " ;
+                  $result2 = $conn->query($sql);
 
-                <tr>
-                   <td>#</td>
-                   <td>First Name</td>
-                   <td>Surname</td>
-                   <td>Position</td>
-                   <td>Assists</td>
-                   <td>Goals</td>
-                   <td>Ratings</td><td>Season AVG</td>
+
+                  $shirtNumber=array();
+                  $firstName=array();
+                  $lastName=array();
+                  $position=array();
+                  $mRating=array();
+                  $goalsScored=array();
+                  $assistsMade=array();
+
+
+
+                  if ($result2->num_rows > 0) {
+                      // output data of each row
+                      while($row = $result2->fetch_assoc()) {
+
+                        $shirtNumber[]=$row["shirtNumber"];
+                        $firstName[]=$row["firstName"];
+                        $lastName[]=$row["lastName"];
+                        $position[]=$row["position"];
+                        $mRating[]=$row["mRating"];
+                        $goalsScored[]=$row["goalsScored"];
+                        $assistsMade[]=$row["assistsMade"];
+
+
+                          echo "
+
+                   <td class='defaultTextCen'>" .$row['shirtNumber']. "</td>
+                   <td>" .$row['firstName']. "</td>
+                   <td>" .$row['lastName']. "</td>
+                   <td>" .$row['position']. "</td>
+                   <td class='defaultTextCen'>" .$row['goalsScored']. "</td>
+                   <td class='defaultTextCen'>" .$row['assistsMade']. "</td>
+                   <td class='defaultTextCen'>" .$row['mRating']. "</td>
                 </tr>
-                <tr>
-                   <td>#</td>
-                   <td>First Name</td>
-                   <td>Surname</td>
-                   <td>Position</td>
-                   <td>Assists</td>
-                   <td>Goals</td>
-                   <td>Ratings</td><td>Season AVG</td>
-                </tr>
-                <tr>
-                   <td>#</td>
-                   <td>First Name</td>
-                   <td>Surname</td>
-                   <td>Position</td>
-                   <td>Assists</td>
-                   <td>Goals</td>
-                   <td>Ratings</td><td>Season AVG</td>
-                </tr>
-                <tr>
-                   <td>#</td>
-                   <td>First Name</td>
-                   <td>Surname</td>
-                   <td>Position</td>
-                   <td>Assists</td>
-                   <td>Goals</td>
-                   <td>Ratings</td><td>Season AVG</td>
-                </tr>
-                <tr>
-                   <td>#</td>
-                   <td>First Name</td>
-                   <td>Surname</td>
-                   <td>Position</td>
-                   <td>Assists</td>
-                   <td>Goals</td>
-                   <td>Ratings</td><td>Season AVG</td>
-                </tr>
-                <tr>
-                   <td>#</td>
-                   <td>First Name</td>
-                   <td>Surname</td>
-                   <td>Position</td>
-                   <td>Assists</td>
-                   <td>Goals</td>
-                   <td>Ratings</td><td>Season AVG</td>
-                </tr>
-                <tr>
-                   <td>#</td>
-                   <td>First Name</td>
-                   <td>Surname</td>
-                   <td>Position</td>
-                   <td>Assists</td>
-                   <td>Goals</td>
-                   <td>Ratings</td><td>Season AVG</td>
-                </tr>
+
+                  ";
+                     }
+                  } else {
+                      echo "0 results";
+                  }
+
+
+                  ?>
+
+
               </table>
 
 
@@ -209,75 +224,185 @@ Matchday Page
            </TD></TABLE>
            <TABLE>
            <TR>
-           <TD width="750" height="370"><div class="defaultText">Default !</div></TD>
+           <TD width="750" height="550"><div class="defaultText">Default !</div></TD>
            </TR>
            </TABLE>
 </TD>
-<TD class="defaultTable" >
-  <TABLE class="defaultTable"  width="450" height="175">
-             <TD>
-               <table class="matchDay" width="450" height="175">
-               <td width="150"><img src="../img/clubLogos/brfc-1.png"></td>
-               <td width="150"><div class="matchTitleTextImg">VS.</div></td>
-               <td width="150"><img src="../img/clubLogos/arsenal-1.png"></td>
-               </table>
-             </TD></TABLE>
-             <TABLE class="defaultTable">
-             <TR>
-               <TD class="defaultTableBlueMidAlign" width="100" height="110"><div class="matchTitleTextImg">0</div></TD>
-             <TD class="defaultTableBlue" width="250" height="110">
-
-             <div class="matchTitleText">Bristol Rovers</div>
-             <div class="matchTitleTextSmall">VS.</div>
-             <div class="matchTitleText">Arsenal XI</div>
-
-             </TD>
-             <TD class="defaultTableBlueMidAlign" width="100" height="110"><div class="matchTitleTextImg">1</div></TD>
-             </TR>
-             </TABLE>
-
-             <TABLE class="defaultTable">
-             <TR>
-             <TD width="340" height="100">
-              <div class="defaultText">
-              <strong>Game Date: </strong> 18th July 2015, 3pm Kick Off.<br>
-              <strong>Weather Conditions: </strong>22&#176; Overcast.<br>
-              <strong>Referee: </strong>Douglas Walker<br>
-              <strong>Attendance: </strong>6720 <strong>(</strong>721 Away<strong>)</strong></div>
 
 
-             </TD>
-             <TD width="110" height="100"><img id="weatherIcon" src="../img/weather/MostlyCloudy.png"></TD>
-             </TR>
-             </TABLE>
+<?php
+  $sql = "SELECT
+fCH.clubName 'homeClubName',fCA.clubName 'awayClubName',fCH.clubImg 'homeImg',fCA.clubImg 'awayImg',f.homeGoals,f.awayGoals, f.kickoffTime,f.temperature,w.weatherName,w.weatherImg,CONCAT(r.firstName,' ',r.lastName) 'refName',att.totalAttendance,att.awayAttendance,f.matchReport
+FROM fixtures f
+LEFT JOIN footballClubs fCH ON fCH.clubId=f.homeTeamId
+LEFT JOIN footballClubs fCA ON fCA.clubId=f.awayTeamId
+LEFT JOIN referees r ON R.refereeId=f.refereeId
+LEFT JOIN stadiums s ON f.stadiumId=s.stadiumId
+LEFT JOIN weather w  ON w.weatherId=f.weatherId
+LEFT JOIN attendances att ON att.fixtureId=f.fixtureId
+WHERE f.fixtureId=1
+  " ;
+  $result3 = $conn->query($sql);
 
-             <TABLE class="defaultTable">
-             <TR>
-             <TD width="450" height="235">
-             <div class="defaultText">
-              Gunner Stephy Mavididi proved the difference in this early pre-season friendly cleverly capitalising on an early defensive mixup between Tom Parkes & goalkeeper Steve Mildenhall.
-              Rovers grew into the game in the second half with James Clarke shone in defence. Despite this, Rovers were unable to break the deadlock and never mounted any serious spells of sustained pressure on the young Arsenal XI's sides goal.
-               Rovers fans will have been left encouraged by the return to action of Jermaine Easter who looked sharp after being brought on as a substitute on 60 minutes.
+
+  $homeClubName=array();
+  $awayClubName=array();
+  $homeImg=array();
+  $awayImg=array();
+  $homeGoals=array();
+  $awayGoals=array();
+  $kickoffTime=array();
+  $temperature=array();
+  $weatherName=array();
+  $weatherImg=array();
+  $refName=array();
+  $totalAttendance=array();
+  $awayAttendance=array();
+  $matchReport=array();
 
 
+  if ($result3->num_rows > 0) {
+      // output data of each row
+      while($row = $result3->fetch_assoc()) {
 
-             </TD>
-             </TR>
-             </TABLE>
-             <table>
-               <tr>
-             <td width="450" height="255">
-               <iframe width="450" height="253" src="https://www.youtube.com/embed/lW_5pZi9avA" frameborder="0" allowfullscreen></iframe>
-             </td>
-           </tr>
-           </table>
-           <table>
-             <tr>
-           <td width="450" height="30">
-             <div class="defaultTextCen">
-             <strong>Match Highlights. Click bottom right to view full screen.</strong></td>
-         </tr>
-         </table>
-           </TD>
+        $homeClubName[]=$row["homeClubName"];
+        $awayClubName[]=$row["awayClubName"];
+        $homeImg[]=$row["homeImg"];
+        $awayImg[]=$row["awayImg"];
+        $homeGoals[]=$row["homeGoals"];
+        $awayGoals[]=$row["awayGoals"];
+        $kickoffTime[]=$row["kickoffTime"];
+        $temperature[]=$row["temperature"];
+        $weatherName[]=$row["weatherName"];
+        $weatherImg[]=$row["weatherImg"];
+        $refName[]=$row["refName"];
+        $totalAttendance[]=$row["totalAttendance"];
+        $awayAttendance[]=$row["awayAttendance"];
+        $matchReport[]=$row["matchReport"];
 
-</TABLE>
+          echo "
+
+          <TD class='defaultTable'>
+            <TABLE class='defaultTable'  width='450' height='175'>
+                       <TD>
+                         <table class='matchDay' width='450' height='175'>
+                         <td width='150'><img src='../img/clubLogos/"
+                          .$row['homeImg'].
+                         "'></td>
+                         <td width='150'><div class='matchTitleTextImg'>VS.</div></td>
+                         <td width='150'><img src='../img/clubLogos/"
+                          .$row['awayImg'].
+                         "'></td>
+                         </table>
+                       </TD></TABLE>
+                       <TABLE class='defaultTable'>
+                       <TR>
+                         <TD class='defaultTableBlueMidAlign' width='100' height='110'><div class='matchTitleTextImg'>"
+                          .$row['homeGoals'].
+                         "</div></TD>
+                       <TD class='defaultTableBlue' width='250' height='110'>
+
+                       <div class='matchTitleText'>"
+                        .$row['homeClubName'].
+                       "</div>
+                       <div class='matchTitleTextSmall'>VS.</div>
+                       <div class='matchTitleText'>"
+                        .$row['awayClubName'].
+                       "</div>
+
+                       </TD>
+                       <TD class='defaultTableBlueMidAlign' width='100' height='110'><div class='matchTitleTextImg'>"
+                        .$row['awayGoals'].
+                       "</div></TD>
+                       </TR>
+                       </TABLE>
+
+                       <TABLE class='defaultTable'>
+                       <TR>
+                       <TD width='340' height='100'>
+                        <div class='defaultText'>
+                        <strong>Game Date: </strong> "
+                         .$row['kickoffTime'].
+                        "<br>
+                        <strong>Weather Conditions: </strong>"
+                         .$row['temperature'].
+                        "&#176; "
+                         .$row['weatherName'].
+                        "<br>
+                        <strong>Referee: </strong>"
+                         .$row['refName'].
+                        "<br>
+                        <strong>Attendance: </strong>"
+                         .$row['totalAttendance'].
+                        "<strong>(</strong>"
+                         .$row['awayAttendance'].
+                        " Away<strong>)</strong></div>
+
+
+                       </TD>
+                       <TD width='110' height='100'><img id='weatherIcon' src='../img/weather/"
+                        .$row['weatherImg'].
+                       "'></TD>
+                       </TR>
+                       </TABLE>
+
+                       <TABLE class='defaultTable'>
+                       <TR>
+                       <TD class='defaultTableBlue' width='450' height='40'>
+                       <div class='defaultText'>
+                      <div class='matchTitleText'>Match Report</div>
+
+
+                       </TD>
+                       </TR>
+                       </TABLE>
+
+                       <TABLE class='defaultTable'>
+                       <TR>
+                       <TD width='450' height='15'>
+
+                       </TD>
+                       </TR>
+                       </TABLE>
+
+                       <TABLE class='defaultTable'>
+                       <TR>
+                       <TD width='450' height='250'>
+                       <div class='defaultText'>
+                         "
+                          .$row['matchReport'].
+                         "
+                       </TD>
+                       </TR>
+                       </TABLE>
+                       <TABLE class='defaultTable'>
+                       <TR>
+                       <TD width='450' height='25'>
+                      </TD>
+                       </TR>
+                       </TABLE>
+                       <table>
+                         <tr>
+                       <td width='450' height='255'>
+                         <iframe width='450' height='253' src='https://www.youtube.com/embed/lW_5pZi9avA' frameborder='0' allowfullscreen></iframe>
+                       </td>
+                     </tr>
+                     </table>
+                     <table>
+                       <tr>
+                     <td width='450' height='30'>
+                       <div class='defaultTextCen'>
+                       <strong>Match Highlights. Click bottom right to view full screen.</strong></td>
+                   </tr>
+                   </table>
+                     </TD>
+
+          </TABLE>
+          ";
+             }
+          } else {
+              echo "0 results";
+          }
+
+
+          ?>
