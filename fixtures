@@ -1,0 +1,171 @@
+<html>
+<head>
+
+<link rel="stylesheet" type="text/css" href="theme.css">
+<link href='http://fonts.googleapis.com/css?family=Montserrat' rel='stylesheet' type='text/css'>
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
+<script src="//code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
+<link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/themes/smoothness/jquery-ui.css">
+<script src="http://code.highcharts.com/highcharts.js"></script>
+<script src="jquery.bxslider.min.js"></script>
+<link href="jquery.bxslider.css" rel="stylesheet">
+<script src="slider.js"></script>
+<meta charset="utf-8">
+
+<?php
+
+/* Connects to MySQL */
+
+$servername = 'gasrating.cofcemipkt4b.eu-west-1.rds.amazonaws.com:3306';
+$username = 'root';
+$password = 'h12yc921yc91921412491dhasjgasdj1284';
+$dbname = 'gasratings';
+
+// Create connection
+$conn = new mysqli($servername, $username, $password, $dbname);
+
+// Check connection
+if ($conn->connect_error) {
+    die("Connection failed: " . $conn->connect_error);
+}
+?>
+
+</head>
+
+<body>
+<TABLE class="defaultTable" width="1200" height="50">
+<div class="matchTitleTextLarge">
+Gas Ratings
+</div>
+<div class="matchTitleText">
+  Your Club. Your Ratings.</div>
+</table>
+<br>
+<table class="defaultTable" width="1230">
+  <tr><td class="defaultTableBlueMidAlign" height="25">
+    <div class="matchLineupTxt">Results &nbsp;&#8226;&nbsp; Fixtures &nbsp;&#8226;&nbsp; Overall Statistics &nbsp;&#8226;&nbsp; Blog &nbsp;&#8226;&nbsp; About</div></td></tr>
+</tr></table>
+
+<br>
+
+<TABLE class="defaultTable" width="1200" height="1000">
+
+
+  <TD class="defaultTable" >
+
+    <table><tr>
+    <TD class="defaultTableBlue" width="450" height="30">
+    <div class="matchTitleText">Next Fixture</div></td>
+    <TD class="defaultTableBlue" width="750" height="30">
+    <div class="matchTitleText">Fixture Information</div>
+  </tr>
+  </table>
+
+  <table width="1200">
+   <tr>
+
+
+     <td ><table class='matchDay' width='450' height='175'>
+                  <td width='150'><img src='../img/clubLogos/brfc-1.png'></td>
+                  <td width='150'><div class='matchTitleTextImg'>VS.</div></td>
+                  <td width='150'><img src='../img/clubLogos/brfc-1.png'></td>
+
+                </table></td>
+      <td width="375"><table width="375"><div class="defaultTextLarge">Home Team<br>VS.<br>
+      Away Team</div><br><div class="defaultTextMed">Competition Name<br>Match Location<br>Monday 01/01/1970 - 7:45PM</div>
+    </table></td>
+     <td width="375"><table width="375"><div class="defaultText"><strong>Ticket News:</strong> Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+       <br><br><strong>Preview: </strong>Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+</div>     </table></td>
+  </tr>
+</table>
+
+<table><tr>
+<TD class="defaultTableBlue" width="1200" height="30">
+<div class="matchTitleText">Upcoming Fixtures</div></td>
+</tr>
+</table>
+
+<table width="1200">
+
+<tr width="1200">
+<th width='150' class='defaultTableLiteBlueCen'>Date</th>
+<th width='100' class='defaultTableLiteBlueCen'>Time</th>
+<th width='185' class='defaultTableLiteBlueCen'>Competition</th>
+<th width='85' class='defaultTableLiteBlueCen'>H/A</th>
+<th width='220' class='defaultTableLiteBlueCen'>Stadium</th>
+<th width='175' class='defaultTableLiteBlueCen'>Home Team</th>
+<th width='175' class='defaultTableLiteBlueCen'>Away Team</th>
+
+
+</tr>
+
+<?php
+$sql = "SELECT
+
+DATE(f.kickoffTime) 'kickoffDate',
+TIME(f.kickoffTime) 'kickoffTime',
+c.competitionName 'compName',
+IF(s.stadiumName='The Memorial Stadium','Home','Away') 'venue',
+fch.clubName 'homeTeamName',
+fca.clubName 'awayTeamName',
+s.stadiumName
+
+FROM fixtures f
+
+
+LEFT JOIN footballClubs fch ON fch.clubId=f.homeTeamId
+LEFT JOIN footballClubs fca ON fca.clubId=f.awayTeamId
+LEFT JOIN stadiums s ON s.stadiumId=f.stadiumId
+LEFT JOIN competitions c ON c.competitionId=f.competitionId
+WHERE f.kickoffTime > CURRENT_DATE()
+   OR (      f.kickoffTime = CURRENT_DATE()
+        AND f.kickoffTime >= CURRENT_TIME()
+       )
+ORDER BY f.kickoffTime
+" ;
+$result = $conn->query($sql);
+
+
+
+if ($result->num_rows > 0) {
+    // output data of each row
+    while($row = $result->fetch_assoc()) {
+
+
+      $kickoffDate[]=$row["kickoffDate"];
+      $kickoffTime[]=$row["kickoffTime"];
+      $compName[]=$row["compName"];
+      $venue[]=$row["venue"];
+      $homeTeamName[]=$row["homeTeamName"];
+      $awayTeamName[]=$row["awayTeamName"];
+      $stadiumName[]=$row["stadiumName"];
+
+
+        echo "
+
+        <td class='defaultTextCen'>" .$row['kickoffDate']. "</td>
+        <td class='defaultTextCen'>" .$row['kickoffTime']. "</td>
+        <td class='defaultTextCen'>" .$row['compName']. "</td>
+        <td class='defaultTextCen'>" .$row['venue']. "</td>
+        <td class='defaultTextCen'>" .$row['stadiumName']. "</td>
+        <td class='defaultTextCen'>" .$row['homeTeamName']. "</td>
+        <td class='defaultTextCen'>" .$row['awayTeamName']. "</td>
+
+</tr>
+
+";
+   }
+} else {
+    echo "0 results";
+}
+
+
+?>
+
+
+</table>
+
+
+</table>
+</body>
