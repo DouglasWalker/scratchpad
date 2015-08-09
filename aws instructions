@@ -1,0 +1,10 @@
+Install webserver on default ec2 amazon Linux image
+
+#install php and MySQL client
+sudo yum install -y httpd24 php56 php56-mysqlnd
+
+#start webserver
+sudo service httpd start
+
+#check http server is up
+sudo chkconfig httpd on
