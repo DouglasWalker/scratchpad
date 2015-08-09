@@ -12,16 +12,44 @@
 <script src="slider.js"></script>
 <meta charset="utf-8">
 
+<script>
+
+		$(document).ready(function() {
+				$('table td:nth-child(8)').each(function() {
+					var Ratings = $(this).text();
+
+					if ((Ratings > 0) && (Ratings < 4)) {
+						$(this).css('backgroundColor', '#FF3300').css('color', '#FFFFFF');
+					}
+					else if((Ratings >= 4) && (Ratings < 6)) {
+						$(this).css('backgroundColor', '#FF3300').css('color', '#000000');
+					}
+					else if((Ratings >= 6) && (Ratings < 8)) {
+						$(this).css('backgroundColor', '#FF9933');
+					}
+          else if((Ratings >= 8) && (Ratings < 9)) {
+            $(this).css('backgroundColor', '#2EB82E');
+          }
+          else if((Ratings >= 9) && (Ratings < 11)) {
+            $(this).css('backgroundColor', '#2EB82E').css('color', '#FFFFFF');
+          }
+          else {
+            $(this).css('backgroundColor', '#FFFFFFF');
+          }
+        				});
+				return false;
+			});
+
+
+</script>
+
 
 
 <?php
 
 /* Connects to MySQL */
 
-$servername = "localhost";
-$username = "root";
-$password = "irene";
-$dbname = "footballdb";
+N/A
 
 // Create connection
 $conn = new mysqli($servername, $username, $password, $dbname);
@@ -32,14 +60,22 @@ if ($conn->connect_error) {
 }
 ?>
 
+
+</head>
+
 <body>
 <TABLE class="defaultTable" width="1200" height="50">
 <div class="matchTitleTextLarge">
-Bristol Rovers Form Tracker
+<a href="http://www.gasratings.co.uk">Gas Ratings</a>
 </div>
 <div class="matchTitleText">
-  Game Centre</div>
+  Your Club. Your Ratings.</div>
 </table>
+<br>
+<table class="defaultTable" width="1230">
+  <tr><td class="defaultTableBlueMidAlign" height="25">
+    <div class="matchLineupTxt">Latest Result &nbsp;&#8226;&nbsp; Results &nbsp;&#8226;&nbsp; <a href="../fixtures.php">Fixtures</a> &nbsp;&#8226;&nbsp; Overall Statistics &nbsp;&#8226;&nbsp; Blog &nbsp;&#8226;&nbsp; About</div></td></tr>
+</tr></table>
 
 <br>
 
@@ -59,26 +95,31 @@ Bristol Rovers Form Tracker
        <td>
 
              <table class="defaultText" width="750">
-               <tr><td colspan="7" class="defaultTableBlueMidAlign" height="25"><div class="matchLineupTxt">Starting Lineup</div></td></tr>
+               <tr><td colspan="8" class="defaultTableBlueMidAlign" height="25"><div class="matchLineupTxt">Starting Lineup</div></td></tr>
 
                <tr>
-                    <td width='50' class="defaultTextCen">#</td>
-                    <td width='150'>First Name</td>
-                    <td width='150'>Surname</td>
-                    <td width='130'>Position</td>
-                    <td width='90' class="defaultTextCen">Assists</td>
-                    <td width='90' class="defaultTextCen">Goals</td>
-                    <td width='90' class="defaultTextCen">Ratings</td>
+                 <th width='50' class='defaultTableLiteBlueCen'>#</td>
+                 <th width='150' class='defaultTableLiteBlueCen'>First Name</td>
+                 <th width='150' class='defaultTableLiteBlueCen'>Surname</td>
+                 <th width='65' class='defaultTableLiteBlueCen'>On</td>
+								 <th width='65' class='defaultTableLiteBlueCen'>Off</td>
+                 <th width='90' class='defaultTableLiteBlueCen'>Goals</td>
+                 <th width='90' class='defaultTableLiteBlueCen'>Assists</td>
+                 <th width='90' class='defaultTableLiteBlueCen'>Ratings</td>
                 </tr>
 
                 <?php
-                  $sql = "SELECT sn.shirtNumber,fp.playerId 'playerId',fp.firstName,fp.lastName,fp.`position`,md.matchRating 'mRating',COUNT(gs.goalId) 'goalsScored',COUNT(`as`.assistId) 'assistsMade'
+                  $sql = "SELECT sn.shirtNumber,fp.playerId 'playerId',fp.firstName,fp.lastName,sd.subbedOn,sd.subbedOff,ROUND(AVG(md.matchRating),2) 'mRating',
+									IF(COUNT(gs.goalId)=0,NULL,COUNT(gs.goalId)) 'goalsScored',
+									IF(COUNT(`as`.assistId)=0,NULL,COUNT(`as`.assistId)) 'assistsMade'
                   FROM matchData md
                   LEFT JOIN footballPlayers fp ON fp.playerId=md.playerId
                   LEFT JOIN goalsScored gs ON gs.fixtureId=md.fixtureId AND gs.playerId=md.playerId
-                  LEFT JOIN assistsmade `as` ON `as`.fixtureId=md.fixtureId AND `as`.playerId=md.playerId
+                  LEFT JOIN assistsMade `as` ON `as`.fixtureId=md.fixtureId AND `as`.playerId=md.playerId
                   LEFT JOIN shirtNumbers sn ON sn.playerId=fp.playerId
-                  WHERE md.startStatus='starter'
+                  LEFT JOIN subData sd ON sd.fixtureId=md.fixtureId AND sd.playerId=fp.playerId
+
+                  WHERE md.startStatus='starter' AND md.fixtureId=16
                   GROUP BY fp.playerId
                   ORDER BY
                      CASE fp.`position`
@@ -95,7 +136,8 @@ Bristol Rovers Form Tracker
                   $shirtNumber=array();
                   $firstName=array();
                   $lastName=array();
-                  $position=array();
+                  $subbedOn=array();
+									$subbedOff=array();
                   $mRating=array();
                   $goalsScored=array();
                   $assistsMade=array();
@@ -109,7 +151,8 @@ Bristol Rovers Form Tracker
                         $shirtNumber[]=$row["shirtNumber"];
                         $firstName[]=$row["firstName"];
                         $lastName[]=$row["lastName"];
-                        $position[]=$row["position"];
+                        $subbedOn[]=$row["subbedOn"];
+												$subbedOff[]=$row["subbedOff"];
                         $mRating[]=$row["mRating"];
                         $goalsScored[]=$row["goalsScored"];
                         $assistsMade[]=$row["assistsMade"];
@@ -117,9 +160,10 @@ Bristol Rovers Form Tracker
 
                           echo "<tr>
                    <td class='defaultTextCen'>" .$row['shirtNumber']. "</td>
-                   <td>" .$row['firstName']. "</td>
-                   <td>" .$row['lastName']. "</td>
-                   <td>" .$row['position']. "</td>
+                   <td class='defaultTextCen'>" .$row['firstName']. "</td>
+                   <td class='defaultTextCen'>" .$row['lastName']. "</td>
+                   <td class='defaultTextCen'>" .$row['subbedOn']. "</td>
+									 <td class='defaultTextRedCen'>" .$row['subbedOff']. "</td>
                    <td class='defaultTextCen'>" .$row['goalsScored']. "</td>
                    <td class='defaultTextCen'>" .$row['assistsMade']. "</td>
                    <td class='defaultTextCen'>" .$row['mRating']. "</td>
@@ -136,27 +180,32 @@ Bristol Rovers Form Tracker
 
               </table>
 
-              <table class="defaultText" width="750">
+							<table class="defaultText" width="750">
+								<tr>
+									<td colspan="8" class="defaultTableBlueMidAlign" height="25"><div class="matchLineupTxt">Starting Lineup</div></td></tr>
 
-                <tr><td colspan="7" class="defaultTableBlueMidAlign"><div class="matchLineupTxt">Substitutes</div></td></tr>
-                <tr>
-                     <td width='50' class='defaultTextCen'>#</td>
-                     <td width='150'>First Name</td>
-                     <td width='150'>Surname</td>
-                     <td width='130'>Position</td>
-                     <td width='90' class='defaultTextCen'>Assists</td>
-                     <td width='90' class='defaultTextCen'>Goals</td>
-                     <td width='90' class='defaultTextCen'>Ratings</td>
-                 </tr>
-                <tr>
+								<tr>
+									<th width='50' class='defaultTableLiteBlueCen'>#</td>
+									<th width='150' class='defaultTableLiteBlueCen'>First Name</td>
+									<th width='150' class='defaultTableLiteBlueCen'>Surname</td>
+									<th width='65' class='defaultTableLiteBlueCen'>On</td>
+									<th width='65' class='defaultTableLiteBlueCen'>Off</td>
+									<th width='90' class='defaultTableLiteBlueCen'>Goals</td>
+									<th width='90' class='defaultTableLiteBlueCen'>Assists</td>
+									<th width='90' class='defaultTableLiteBlueCen'>Ratings</td>
+								 </tr>
                 <?php
-                  $sql = "SELECT sn.shirtNumber,fp.playerId 'playerId',fp.firstName,fp.lastName,fp.`position`,md.matchRating 'mRating',COUNT(gs.goalId) 'goalsScored',COUNT(`as`.assistId) 'assistsMade'
+                  $sql = "SELECT sn.shirtNumber,fp.playerId 'playerId',fp.firstName,fp.lastName,sd.subbedOn,sd.subbedOff,ROUND(AVG(md.matchRating),2) 'mRating',
+									IF(COUNT(gs.goalId)=0,NULL,COUNT(gs.goalId)) 'goalsScored',
+									IF(COUNT(`as`.assistId)=0,NULL,COUNT(`as`.assistId)) 'assistsMade'
                   FROM matchData md
                   LEFT JOIN footballPlayers fp ON fp.playerId=md.playerId
                   LEFT JOIN goalsScored gs ON gs.fixtureId=md.fixtureId AND gs.playerId=md.playerId
-                  LEFT JOIN assistsmade `as` ON `as`.fixtureId=md.fixtureId AND `as`.playerId=md.playerId
+                  LEFT JOIN assistsMade `as` ON `as`.fixtureId=md.fixtureId AND `as`.playerId=md.playerId
                   LEFT JOIN shirtNumbers sn ON sn.playerId=fp.playerId
-                  WHERE md.startStatus='substitute'
+                  LEFT JOIN subData sd ON sd.fixtureId=md.fixtureId AND sd.playerId=fp.playerId
+
+                  WHERE md.startStatus='substitute' AND md.fixtureId=16
                   GROUP BY fp.playerId
                   ORDER BY
                      CASE fp.`position`
@@ -170,38 +219,30 @@ Bristol Rovers Form Tracker
                   $result2 = $conn->query($sql);
 
 
-                  $shirtNumber=array();
-                  $firstName=array();
-                  $lastName=array();
-                  $position=array();
-                  $mRating=array();
-                  $goalsScored=array();
-                  $assistsMade=array();
-
-
-
                   if ($result2->num_rows > 0) {
                       // output data of each row
                       while($row = $result2->fetch_assoc()) {
 
-                        $shirtNumber[]=$row["shirtNumber"];
-                        $firstName[]=$row["firstName"];
-                        $lastName[]=$row["lastName"];
-                        $position[]=$row["position"];
-                        $mRating[]=$row["mRating"];
-                        $goalsScored[]=$row["goalsScored"];
-                        $assistsMade[]=$row["assistsMade"];
+												$shirtNumber[]=$row["shirtNumber"];
+												$firstName[]=$row["firstName"];
+												$lastName[]=$row["lastName"];
+												$subbedOn[]=$row["subbedOn"];
+												$subbedOff[]=$row["subbedOff"];
+												$mRating[]=$row["mRating"];
+												$goalsScored[]=$row["goalsScored"];
+												$assistsMade[]=$row["assistsMade"];
 
 
                           echo "
 
-                   <td class='defaultTextCen'>" .$row['shirtNumber']. "</td>
-                   <td>" .$row['firstName']. "</td>
-                   <td>" .$row['lastName']. "</td>
-                   <td>" .$row['position']. "</td>
-                   <td class='defaultTextCen'>" .$row['goalsScored']. "</td>
-                   <td class='defaultTextCen'>" .$row['assistsMade']. "</td>
-                   <td class='defaultTextCen'>" .$row['mRating']. "</td>
+													<td class='defaultTextCen'>" .$row['shirtNumber']. "</td>
+			                    <td class='defaultTextCen'>" .$row['firstName']. "</td>
+			                    <td class='defaultTextCen'>" .$row['lastName']. "</td>
+			                    <td class='defaultTextGreenCen'>" .$row['subbedOn']. "</td>
+			 									 <td class='defaultTextCen'>" .$row['subbedOff']. "</td>
+			                    <td class='defaultTextCen'>" .$row['goalsScored']. "</td>
+			                    <td class='defaultTextCen'>" .$row['assistsMade']. "</td>
+			                    <td class='defaultTextCen'>" .$row['mRating']. "</td>
                 </tr>
 
                   ";
@@ -224,23 +265,116 @@ Bristol Rovers Form Tracker
            </TD></TABLE>
            <TABLE>
            <TR>
-           <TD width="750" height="550"><div class="defaultText">Default !</div></TD>
+           <TD width="750" height="550"><div class="defaultText">
+
+
+             <?php
+               $sql = "SELECT md.fixtureId,md.playerId,ROUND(AVG(md.matchRating),2) 'matchRating',md.startStatus,fp.`position`,CONCAT(fp.firstName,' ',fp.lastName) 'fullName2',ROUND(AVG(md2.matchRating),2) 'avgRating' FROM matchData md
+                LEFT JOIN footballPlayers fp ON fp.playerId=md.playerId
+                LEFT JOIN matchData md2 ON md2.playerId=md.playerId
+                WHERE md.fixtureId=16 AND md.matchRating IS NOT NULL
+                GROUP BY md.playerId
+                ORDER BY md.startStatus,
+                   CASE fp.`position`
+                      WHEN 'Goalkeeper' THEN 1
+                      WHEN 'Defender' THEN 2
+                      WHEN 'Midfielder' THEN 3
+                      WHEN 'Forward' THEN 4
+                      ELSE 5
+                   END, md.playerId
+
+               " ;
+               $result4 = $conn->query($sql);
+
+
+
+               if ($result4->num_rows > 0) {
+                   // output data of each row
+                   while($row = $result4->fetch_assoc()) {
+
+                     $matchRating[]=$row["matchRating"];
+                     $startStatus[]=$row["startStatus"];
+                     $fullNameArray[]=$row["fullName2"];
+                     $position[]=$row["position"];
+                     $avgRating[]=$row["avgRating"];
+
+                     ;
+                    }
+                   } else {
+                     }
+                     ?>
+                     <script>
+                     $( document ).ready(function() {
+                       $('#container').highcharts({
+
+												 credits: {
+            enabled: false
+        },
+
+
+                           chart: {
+                               type: 'column'
+                           },
+                           title: {
+                               text: 'Ratings'
+                           },
+                           xAxis: [{
+                               categories: ['<?php echo implode("','", $fullNameArray);?>']
+                           }],
+                           yAxis: {
+                               max: 10,
+
+                               title: {
+                                   text: ["Rating"],
+                                                         }
+                           },
+                           series: [{
+                               name: 'Player Rating',
+                               data: [<?php echo implode(",", $matchRating);?>]
+                           },
+                           {
+                               name: 'AVG Rating',
+                               data: [<?php echo implode(",", $avgRating);?>]
+                           }
+
+                          ]
+
+                          },function(chart){
+
+
+                              $.each(chart.series[0].data,function(i,data){
+                                      data.graphic.attr({
+                                          fill:'#0066FF',
+
+                                      });
+
+                              });
+
+                          });
+                      });
+</script>
+
+
+<div id='container' style='width:750px; height:595px;'>
+
+           </div></TD>
            </TR>
+
            </TABLE>
 </TD>
 
 
 <?php
   $sql = "SELECT
-fCH.clubName 'homeClubName',fCA.clubName 'awayClubName',fCH.clubImg 'homeImg',fCA.clubImg 'awayImg',f.homeGoals,f.awayGoals, f.kickoffTime,f.temperature,w.weatherName,w.weatherImg,CONCAT(r.firstName,' ',r.lastName) 'refName',att.totalAttendance,att.awayAttendance,f.matchReport
+fCH.clubName 'homeClubName',fCA.clubName 'awayClubName',fCH.clubImg 'homeImg',fCA.clubImg 'awayImg',f.homeGoals,f.awayGoals, f.kickoffTime,f.temperature,w.weatherName,w.weatherImg,CONCAT(r.firstName,' ',r.lastName) 'refName',att.totalAttendance,att.awayAttendance,f.matchReport,f.highlightsURL
 FROM fixtures f
 LEFT JOIN footballClubs fCH ON fCH.clubId=f.homeTeamId
 LEFT JOIN footballClubs fCA ON fCA.clubId=f.awayTeamId
-LEFT JOIN referees r ON R.refereeId=f.refereeId
+LEFT JOIN referees r ON r.refereeId=f.refereeId
 LEFT JOIN stadiums s ON f.stadiumId=s.stadiumId
 LEFT JOIN weather w  ON w.weatherId=f.weatherId
 LEFT JOIN attendances att ON att.fixtureId=f.fixtureId
-WHERE f.fixtureId=1
+WHERE f.fixtureId=16
   " ;
   $result3 = $conn->query($sql);
 
@@ -259,6 +393,7 @@ WHERE f.fixtureId=1
   $totalAttendance=array();
   $awayAttendance=array();
   $matchReport=array();
+  $highlightsURL=array();
 
 
   if ($result3->num_rows > 0) {
@@ -279,6 +414,7 @@ WHERE f.fixtureId=1
         $totalAttendance[]=$row["totalAttendance"];
         $awayAttendance[]=$row["awayAttendance"];
         $matchReport[]=$row["matchReport"];
+				$highlightsURL[]=$row["highlightsURL"];
 
           echo "
 
@@ -321,6 +457,8 @@ WHERE f.fixtureId=1
                        <TR>
                        <TD width='340' height='100'>
                         <div class='defaultText'>
+                          <strong>Competition: </strong>
+                           Skybet League Two<br>
                         <strong>Game Date: </strong> "
                          .$row['kickoffTime'].
                         "<br>
@@ -334,7 +472,7 @@ WHERE f.fixtureId=1
                         "<br>
                         <strong>Attendance: </strong>"
                          .$row['totalAttendance'].
-                        "<strong>(</strong>"
+                        "<strong>&nbsp;(</strong>"
                          .$row['awayAttendance'].
                         " Away<strong>)</strong></div>
 
@@ -359,7 +497,7 @@ WHERE f.fixtureId=1
 
                        <TABLE class='defaultTable'>
                        <TR>
-                       <TD width='450' height='15'>
+                       <TD width='450' height='10'>
 
                        </TD>
                        </TR>
@@ -367,7 +505,7 @@ WHERE f.fixtureId=1
 
                        <TABLE class='defaultTable'>
                        <TR>
-                       <TD width='450' height='250'>
+                       <TD width='450' height='175'>
                        <div class='defaultText'>
                          "
                           .$row['matchReport'].
@@ -377,25 +515,42 @@ WHERE f.fixtureId=1
                        </TABLE>
                        <TABLE class='defaultTable'>
                        <TR>
-                       <TD width='450' height='25'>
+                       <TD width='450' height='10'>
                       </TD>
                        </TR>
                        </TABLE>
                        <table>
                          <tr>
+                           <TD class='defaultTableBlue' width='450' height='40'>
+                           <div class='defaultText'>
+                          <div class='matchTitleText'>Match Highlights</div>
+                           </TD>
+                           <TD width='450' height='10'>
+                          </TD>
+                        </tr><tr>
                        <td width='450' height='255'>
-                         <iframe width='450' height='253' src='https://www.youtube.com/embed/lW_5pZi9avA' frameborder='0' allowfullscreen></iframe>
+                         <iframe width='450' height='253' src='
+
+												 "
+													.$row['highlightsURL'].
+												 "
+
+												 ' frameborder='0' allowfullscreen></iframe>
                        </td>
                      </tr>
                      </table>
                      <table>
                        <tr>
+
+
+
                      <td width='450' height='30'>
                        <div class='defaultTextCen'>
-                       <strong>Match Highlights. Click bottom right to view full screen.</strong></td>
+                       Click bottom right to view full screen.</td>
                    </tr>
                    </table>
                      </TD>
+                   </tr>
 
           </TABLE>
           ";
